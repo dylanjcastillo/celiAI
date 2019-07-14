@@ -9,9 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nano \
     sudo \
     python-pip \
-    gnupg
+    gnupg \
+    ffmpeg
 
-RUN conda env create --name celiai --file requirements.txt --channel conda-forge
+RUN conda create --name celiai --channel conda-forge --file requirements.txt
 RUN echo "source activate celiai" > ~/.bashrc
 ENV PATH /opt/conda/envs/celiai/bin/:$PATH
 ENV PYTHONPATH /celiAI:$PYTHONPATH
