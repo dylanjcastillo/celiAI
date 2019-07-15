@@ -3,5 +3,6 @@ import pathlib
 
 CELIAI_ROOT = pathlib.Path(os.environ["CELIAI"])
 DATA = CELIAI_ROOT / "data"
-RAW = DATA / "raw"
-INTERIM = DATA / "interim"
+MP3 = DATA / "mp3"
+WAV = DATA / "wav"
+SPECTROGRAMS = DATA / "spectrograms"
