@@ -9,6 +9,6 @@ Small project for classifying salsa and merengue songs using Deep Learning
 docker build -t celiai .
 ```
 3. Run the docker containing and map the volumes:
-``` 
-docker run -it celiai_img /path/to/celiAI/:/celiAI/ celiai
+```
+docker run -it --name celiai_img -v /path/to/celiAI/:/celiAI/ -p 8888:8888 celiai
 ```
