@@ -12,3 +12,14 @@ docker build -t celiai .
 ```
 docker run -it --name celiai_img -v /path/to/celiAI/:/celiAI/ -p 8888:8888 celiai
 ```
+
+# Running Jupyter Notebook in container
+1. Activate fastai environment:
+```
+conda activate fastai
+```
+2. Run jupyter notebook:
+```
+jupyter notebook --ip 0.0.0.0 --no-browser --allow-root
+```
+3. On your host go to `localhost:8888/` and introduce the  required token
