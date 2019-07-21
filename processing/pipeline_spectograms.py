@@ -8,44 +8,52 @@ import numpy as np
 from pydub import AudioSegment
 from tqdm import tqdm
 
+from processing.data_management import get_genres, remove_and_create_empty_directory
+
 from config.paths import MP3, SPECTROGRAMS, WAV
 
 MS_ADJUSTMENT = 1000
 
 
-def generate_wav_samples(genre: str, sample_size: int = 1000):
+def generate_wav_samples(sample_size: int = 1000) -> None:
 
-    mp3_path = MP3 / genre
-    files = [file_name for file_name in mp3_path.iterdir()]
+    _, genres = get_genres(MP3)
 
-    for i in range(len(files)):
-        print(f"Generating samples for {genre} {i + 1}")
-        current_file = files[i]
-        song = AudioSegment.from_mp3(current_file)
-        song.set_channels(1)
-        length_song = song.duration_seconds
-        samples = length_song * np.random.sample(size=sample_size)
-
-        for j in tqdm(range(sample_size)):
-            start = samples[j] * MS_ADJUSTMENT
-            end = start + 5 * MS_ADJUSTMENT
-            sample_song = song[start:end]
-            output_path = WAV / genre / (genre + f"_{i + 1}_{j + 1}.wav")
-            sample_song.export(out_f=output_path, format="wav")
-
-
-def generate_spectograms(genre: str):
-    wav_path = WAV / genre
-    files = [file_name for file_name in wav_path.iterdir()]
-
-    for file_n in tqdm(files):
-        re_name = re.compile(f"(?<=_)(.*)(?=.wav)")
-        index = re_name.search(file_n.as_posix()).group(1)
-        output_path = SPECTROGRAMS / genre / (genre + f"_{index}.png")
-        create_spectrogram(file_n, output_path)
+    for genre in genres:
+        genre_path = MP3 / genre
+        files = [file_name for file_name in genre_path.iterdir()]
+        remove_and_create_empty_directory(WAV/genre)
+        print(f"Generating samples for {genre}")
+        for i in range(len(files)):
+            print(f"Generating samples from file {i + 1}")
+            current_file = files[i]
+            song = AudioSegment.from_mp3(current_file)
+            song.set_channels(1)
+            length_song = song.duration_seconds
+            samples = length_song * np.random.sample(size=sample_size)
+            for j in tqdm(range(sample_size)):
+                start = samples[j] * MS_ADJUSTMENT
+                end = start + 5 * MS_ADJUSTMENT
+                sample_song = song[start:end]
+                output_path = WAV / genre / (genre + f"_{i + 1}_{j + 1}.wav")
+                sample_song.export(out_f=output_path, format="wav")
 
 
-def create_spectrogram(input_path: str, output_path: str):
+def generate_spectograms() -> None:
+    _, genres = get_genres(WAV)
+    for genre in genres:
+        genre_path = WAV / genre
+        files = [file_name for file_name in genre_path.iterdir()]
+        remove_and_create_empty_directory(SPECTROGRAMS/genre)
+        print(f"Generating samples for {genre}")
+        for file_n in tqdm(files):
+            re_name = re.compile(f"(?<=_)(.*)(?=.wav)")
+            index = re_name.search(file_n.as_posix()).group(1)
+            output_path = SPECTROGRAMS / genre / (genre + f"_{index}.png")
+            create_spectrogram(file_n, output_path)
+
+
+def create_spectrogram(input_path: str, output_path: str) -> None:
     plt.interactive(False)
     clip, sample_rate = librosa.load(input_path, sr=None)
     fig = plt.figure(figsize=[1, 1])
@@ -64,6 +72,4 @@ def create_spectrogram(input_path: str, output_path: str):
 
 
 if __name__ == "__main__":
-    # clear_directories()
-    # generate_wav_samples("merengue")
-    generate_spectograms("merengue")
+    generate_spectograms()
